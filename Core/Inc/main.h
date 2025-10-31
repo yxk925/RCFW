@@ -121,6 +121,7 @@ void Error_Handler(void);
 #define ENCODER_REAR_LEFT_IN_1_GPIO_Port GPIOB
 #define ENCODER_REAR_LEFT_IN_2_Pin GPIO_PIN_7
 #define ENCODER_REAR_LEFT_IN_2_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -130,5 +131,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
