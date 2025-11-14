@@ -23,7 +23,7 @@ void MTR_init(T_MTR_Handle      *p_handle,
   p_handle->pwmChannel     = p_pwmChannel;
 
   MTR_setDirection(p_handle, MTR_DIRECTION_STOP);
-  MTR_setSpeed    (p_handle, 0                 );
+  MTR_setPWM    (p_handle, 0                 );
 
   return;
 }
@@ -69,7 +69,7 @@ T_MTR_DIRECTION MTR_getDirection(T_MTR_Handle *p_handle)
   return p_handle->direction;
 }
 
-void MTR_setSpeed(T_MTR_Handle *p_handle, uint32_t p_speed)
+void MTR_setPWM(T_MTR_Handle *p_handle, uint32_t p_speed)
 {
   if (p_speed == p_handle->speed)
   {

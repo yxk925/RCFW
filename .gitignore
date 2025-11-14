@@ -4,5 +4,5 @@
 *.bin
 *.elf
 *.map
-Debug
-Release
+Debug/
+Release/

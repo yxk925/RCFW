@@ -46,10 +46,16 @@ int32_t ENC_getCount(T_ENC_Handle *p_handle)
   int32_t l_count;
 
   l_count = p_handle->value;
+  p_handle->total += l_count;
 
   ENC_reset(p_handle);
 
   return l_count;
+}
+
+int32_t ENC_getTotal(T_ENC_Handle *p_handle)
+{
+	return p_handle->total;
 }
 
 void ENC_logInfo(T_ENC_Handle *p_handle)

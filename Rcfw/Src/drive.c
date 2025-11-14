@@ -80,6 +80,8 @@ void DRV_init(TIM_HandleTypeDef *p_pwmTimerHandle,
 
   g_DRV_context.selectPressedStartTimeInS = 0;
 
+  int32_t right_trim = STP_DRIVE_PWM_TRIM_RIGHT;
+  int32_t left_trim = -right_trim;
   /* Setup all 4 wheels */
   WHL_init(&g_DRV_context.wheelFrontRight,
             CST_FRONT_RIGHT_WHEEL_NAME,
@@ -88,7 +90,8 @@ void DRV_init(TIM_HandleTypeDef *p_pwmTimerHandle,
             MOTOR_FRONT_RIGHT_OUT_2_GPIO_Port,
             MOTOR_FRONT_RIGHT_OUT_2_Pin,
             p_pwmTimerHandle,
-            TIM_CHANNEL_4,
+            TIM_CHANNEL_3,
+			right_trim,
             true,
             p_frontRightEncoderTimerHandle,
             STP_DEFAULT_MOTORS_MODE);
@@ -100,7 +103,8 @@ void DRV_init(TIM_HandleTypeDef *p_pwmTimerHandle,
             MOTOR_FRONT_LEFT_OUT_2_GPIO_Port,
             MOTOR_FRONT_LEFT_OUT_2_Pin,
             p_pwmTimerHandle,
-            TIM_CHANNEL_3,
+            TIM_CHANNEL_4,
+			left_trim,
             false,
             p_frontLeftEncoderTimerHandle,
             STP_DEFAULT_MOTORS_MODE);
@@ -113,6 +117,7 @@ void DRV_init(TIM_HandleTypeDef *p_pwmTimerHandle,
             MOTOR_REAR_LEFT_OUT_2_Pin,
             p_pwmTimerHandle,
             TIM_CHANNEL_2,
+			left_trim,
             false,
             p_rearLeftEncoderTimerHandle,
             STP_DEFAULT_MOTORS_MODE);
@@ -125,6 +130,7 @@ void DRV_init(TIM_HandleTypeDef *p_pwmTimerHandle,
             MOTOR_REAR_RIGHT_OUT_2_Pin,
             p_pwmTimerHandle,
             TIM_CHANNEL_1,
+			right_trim,
             true,
             p_rearRightEncoderTimerHandle,
             STP_DEFAULT_MOTORS_MODE);
@@ -532,7 +538,7 @@ void DRV_updateFromCommands(T_SFO_Handle *p_commandsFifo, bool p_logInfo)
       /* Custom */
       else if (l_command[0] == 'C')
       {
-        g_DRV_context.isPidModeOn = false;
+        // g_DRV_context.isPidModeOn = false;
 
         DRV_getSpeedsFromCommand(&l_command[1],
                                  &l_frontRightSpeed,
@@ -545,10 +551,10 @@ void DRV_updateFromCommands(T_SFO_Handle *p_commandsFifo, bool p_logInfo)
                                 l_rearRightSpeed,
                                 l_rearLeftSpeed);
 
-        WHL_setDirectTarget(&g_DRV_context.wheelFrontRight, abs(l_frontRightSpeed));
-        WHL_setDirectTarget(&g_DRV_context.wheelFrontLeft , abs(l_frontLeftSpeed ));
-        WHL_setDirectTarget(&g_DRV_context.wheelRearRight , abs(l_rearRightSpeed ));
-        WHL_setDirectTarget(&g_DRV_context.wheelRearLeft  , abs(l_rearLeftSpeed  ));
+        WHL_setPidTarget(&g_DRV_context.wheelFrontRight, abs(l_frontRightSpeed));
+        WHL_setPidTarget(&g_DRV_context.wheelFrontLeft , abs(l_frontLeftSpeed ));
+        WHL_setPidTarget(&g_DRV_context.wheelRearRight , abs(l_rearRightSpeed ));
+        WHL_setPidTarget(&g_DRV_context.wheelRearLeft  , abs(l_rearLeftSpeed  ));
       }
       else if ((l_command[0] == 'K') && (l_command[1] == 'P'))
       {
@@ -588,8 +594,8 @@ void DRV_updateFromCommands(T_SFO_Handle *p_commandsFifo, bool p_logInfo)
       /* Update all 4 wheels PIDs, adjusting speeds, to reach targets */
       WHL_updatePidSpeed(&g_DRV_context.wheelFrontRight);
       WHL_updatePidSpeed(&g_DRV_context.wheelFrontLeft );
-      WHL_updatePidSpeed(&g_DRV_context.wheelRearRight );
-      WHL_updatePidSpeed(&g_DRV_context.wheelRearLeft  );
+      // WHL_updatePidSpeed(&g_DRV_context.wheelRearRight );
+      // WHL_updatePidSpeed(&g_DRV_context.wheelRearLeft  );
     }
     else
     {
@@ -672,8 +678,8 @@ void DRV_logInfo(bool p_compactLog)
 
   WHL_logInfo(&g_DRV_context.wheelFrontRight);
   WHL_logInfo(&g_DRV_context.wheelFrontLeft );
-  WHL_logInfo(&g_DRV_context.wheelRearRight );
-  WHL_logInfo(&g_DRV_context.wheelRearLeft  );
+  // WHL_logInfo(&g_DRV_context.wheelRearRight );
+  // WHL_logInfo(&g_DRV_context.wheelRearLeft  );
 
   return;
 }
@@ -691,7 +697,7 @@ static void DRV_getSpeedFromCommand(char *p_string, uint32_t *p_speed)
   }
   else
   {
-    *p_speed = UTI_normalizeIntValue(l_speed ,
+    *p_speed = UTI_normalizeIntValueExclude0(l_speed ,
                                      STP_MASTER_MIN_SPEED,
                                      STP_MASTER_MAX_SPEED,
                                      STP_DRIVE_MIN_SPEED,

@@ -9,6 +9,7 @@ typedef struct T_ENC_Handle
 {
   char              *name;
   int32_t            value;
+  int32_t            total;
   bool               invertOnUpdate;
   TIM_HandleTypeDef *timerHandle;
 } T_ENC_Handle;
@@ -21,6 +22,7 @@ void ENC_init(T_ENC_Handle      *p_handle,
 void    ENC_reset   (T_ENC_Handle *p_handle                 );
 void    ENC_update  (T_ENC_Handle *p_handle, int32_t p_value);
 int32_t ENC_getCount(T_ENC_Handle *p_handle                 );
+int32_t ENC_getTotal(T_ENC_Handle *p_handle);
 void    ENC_logInfo (T_ENC_Handle *p_handle                 );
 
 #endif /* __ENCODER_H */

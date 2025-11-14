@@ -6,6 +6,7 @@
 #include "setup.h"
 #include "chrono.h"
 #include "log.h"
+#include <math.h>
 
 void WHL_init(T_WHL_Handle      *p_handle,
               char              *p_name,
@@ -15,6 +16,7 @@ void WHL_init(T_WHL_Handle      *p_handle,
               uint32_t           p_dirPin2,
               TIM_HandleTypeDef *p_pwmTimerHandle,
               uint32_t           p_pwmChannel,
+			  int32_t            p_pwm_trim,
               bool               p_invertOnUpdate,
               TIM_HandleTypeDef *p_encoderTimerHandle,
               bool               p_isMotorOn)
@@ -52,11 +54,12 @@ void WHL_init(T_WHL_Handle      *p_handle,
             STP_DRIVE_PID_I_FACTOR,
             STP_DRIVE_PID_D_FACTOR,
             0,
-            STP_DRIVE_MIN_SPEED,
+            -STP_DRIVE_MAX_SPEED,
             STP_DRIVE_MAX_SPEED,
             STP_DRIVE_PID_ANTI_WIND_UP_FACTOR);
 
   p_handle->isMotorOn = p_isMotorOn;
+  p_handle->pwm_trim = p_pwm_trim;
 
   return;
 }
@@ -70,7 +73,7 @@ void WHL_turnMotorOn(T_WHL_Handle *p_handle)
 
 void WHL_turnMotorOff(T_WHL_Handle *p_handle)
 {
-  MTR_setSpeed(&p_handle->motor, 0);
+  MTR_setPWM(&p_handle->motor, 0);
 
   p_handle->isMotorOn = false;
 
@@ -96,7 +99,14 @@ void WHL_setSpeed(T_WHL_Handle *p_handle, uint32_t p_speed)
 {
   if (p_handle->isMotorOn == true)
   {
-    MTR_setSpeed(&p_handle->motor, p_speed);
+	uint32_t pwm =  UTI_normalizeIntValueExclude0(abs(p_speed),
+									 STP_DRIVE_MIN_SPEED,
+									 STP_DRIVE_MAX_SPEED,
+									 STP_DRIVE_MIN_PWM_CONTINUE,
+									 STP_DRIVE_MAX_PWM,
+									 p_speed > 0 ? false : true);
+
+    MTR_setPWM(&p_handle->motor, pwm);
   }
   else
   {
@@ -166,6 +176,8 @@ void WHL_updatePidSpeed(T_WHL_Handle *p_handle)
 
   l_pidSpeed = PID_update(&p_handle->pid, fabs(p_handle->averageSpeed), l_elapsedTimeInUs);
 
+  l_pidSpeed += 10;
+
   WHL_setSpeed(p_handle, l_pidSpeed);
 
   return;
@@ -182,18 +194,21 @@ void WHL_logInfo(T_WHL_Handle *p_handle)
   uint32_t        l_targetSpeed;
   uint32_t        l_actualSpeed;
   int32_t         l_count;
+  int32_t         l_total;
 
   l_direction   = MTR_getDirection  (&p_handle->motor  );
   l_targetSpeed = PID_getTargetValue(&p_handle->pid    );
   l_actualSpeed = MTR_getSpeed      (&p_handle->motor  );
   l_count       = ENC_getCount      (&p_handle->encoder);
+  l_total		= ENC_getTotal      (&p_handle->encoder);
 
-  LOG_info("%s direction / target / speed / count / average: %2u / %2u / %2u / %2d / %2d",
+  LOG_info("%s direction / target / speed / count / total / average: %2u / %2u / %2u / %2d / %2d / %2d",
            p_handle->name,
            l_direction,
            l_targetSpeed,
            l_actualSpeed,
            l_count,
+		   l_total,
       (int)p_handle->averageSpeed);
 
   return;

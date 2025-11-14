@@ -27,7 +27,7 @@ void  PID_init(T_PID_Handle *p_handle,
   p_handle->antiWindUpValue = p_antiWindUpFactor * UTI_MAX(abs(p_handle->minValue), abs(p_handle->maxValue));
 
   PID_reset  (p_handle       );
-  PID_logInfo(p_handle, false);
+  PID_logInfo(p_handle, true);
 
   return;
 }
@@ -133,8 +133,12 @@ float PID_update(T_PID_Handle *p_handle, float p_currentValue, uint32_t p_timeDe
 
   l_currentError = p_handle->targetValue - p_currentValue;
 
+  const int32_t MAX_DELTA_TIME = 20;
+  int32_t delta_time = p_timeDelta > MAX_DELTA_TIME ? MAX_DELTA_TIME : p_timeDelta;
+  int32_t l_i_delta = l_currentError * (int32_t)delta_time;
+
   p_handle->pValue    =  l_currentError;
-  p_handle->iValue   +=  l_currentError * p_timeDelta;
+  p_handle->iValue   +=  l_i_delta;
   p_handle->iValue    =  UTI_clampIntValue(p_handle->iValue, -p_handle->antiWindUpValue, p_handle->antiWindUpValue, true, 0);
   p_handle->dValue    = (l_currentError - p_handle->lastError) / p_timeDelta;
   p_handle->lastError =  l_currentError;
@@ -142,6 +146,7 @@ float PID_update(T_PID_Handle *p_handle, float p_currentValue, uint32_t p_timeDe
   p_handle->computedValue = p_handle->kp * p_handle->pValue + p_handle->ki * p_handle->iValue + p_handle->kd * p_handle->dValue;
   p_handle->computedValue = UTI_clampIntValue(p_handle->computedValue, p_handle->minValue, p_handle->maxValue, true, 0);
 
+  // PID_logInfo(p_handle, true);
   return p_handle->computedValue;
 }
 

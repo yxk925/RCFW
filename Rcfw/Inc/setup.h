@@ -31,7 +31,7 @@
   #define STP_SW_RESET_POLLING_PERIOD_IN_S    1
   #define STP_BATTERY_POLLING_PERIOD_IN_S    10
   #define STP_LED_UPDATE_MODE_PERIOD_IN_S     1
-  #define STP_DRIVE_LOG_INFO_PERIOD_IN_S      5
+  #define STP_DRIVE_LOG_INFO_PERIOD_IN_S      1
   #define STP_VELOCITY_REPORT_PERIOD_IN_MS 5000
 
 #else /* RELEASE */
@@ -45,15 +45,19 @@
 #endif
 
 #define STP_MASTER_MIN_SPEED   0
-#define STP_MASTER_MAX_SPEED  25
+#define STP_MASTER_MAX_SPEED  60
 #define STP_DRIVE_MIN_SPEED    0
-#define STP_DRIVE_MAX_SPEED   40
+#define STP_DRIVE_MAX_SPEED   60
+#define STP_DRIVE_MIN_PWM_STARTUP     60
+#define STP_DRIVE_MIN_PWM_CONTINUE    40
+#define STP_DRIVE_MAX_PWM    100
 
-#define STP_DRIVE_PID_P_FACTOR                    1.00f
-#define STP_DRIVE_PID_I_FACTOR                    1.00f
-#define STP_DRIVE_PID_D_FACTOR                    0.00f
-#define STP_DRIVE_PID_ANTI_WIND_UP_FACTOR         0.00f
-#define STP_DRIVE_PID_ENCODER_TO_SPEED_FACTOR    25000
+#define STP_DRIVE_PID_P_FACTOR                    1.0f
+#define STP_DRIVE_PID_I_FACTOR                    0.002f
+#define STP_DRIVE_PID_D_FACTOR                    1.0f
+#define STP_DRIVE_PID_ANTI_WIND_UP_FACTOR         1000.0f
+#define STP_DRIVE_PID_ENCODER_TO_SPEED_FACTOR    (60000000/5200)
+#define STP_DRIVE_PWM_TRIM_RIGHT                  -1
 
 #define STP_JOYSTICKS_THRESHOLD   15
 #define STP_JOYSTICKS_FIXED_SPEED 20

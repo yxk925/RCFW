@@ -16,6 +16,7 @@ typedef struct T_WHL_Handle
   T_CBU_Handle  speedBuffer;
   float         averageSpeed;
   bool          isMotorOn;
+  int32_t       pwm_trim;
 } T_WHL_Handle;
 
 void WHL_init(T_WHL_Handle      *p_handle,
@@ -26,6 +27,7 @@ void WHL_init(T_WHL_Handle      *p_handle,
               uint32_t           p_dirPin2,
               TIM_HandleTypeDef *p_pwmTimerHandle,
               uint32_t           p_pwmChannel,
+			  int32_t            p_pwm_trim,
               bool               p_invertOnUpdate,
               TIM_HandleTypeDef *p_encoderTimerHandle,
               bool               p_isMotorOn);

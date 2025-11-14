@@ -182,6 +182,25 @@ float UTI_normalizeFloatValue(float p_value, float p_inMinValue, float p_inMaxVa
   return l_returnValue;
 }
 
+int32_t  UTI_normalizeIntValueExclude0  (int32_t p_value, int32_t p_inMinValue, int32_t p_inMaxValue, int32_t p_outMinValue, int32_t    p_outMaxValue, bool p_isInversionNeeded)
+{
+	if (abs(p_value) > 0) {
+		return UTI_normalizeIntValue(p_value, p_inMinValue, p_inMaxValue, p_outMinValue, p_outMaxValue, p_isInversionNeeded);
+	}
+
+	return 0;
+}
+
+float UTI_normalizeFloatValueExclude0(float p_value, float p_inMinValue, float p_inMaxValue, float p_outMinValue, float p_outMaxValue, bool p_isInversionNeeded)
+{
+	if (abs(p_value) > 0) {
+		return UTI_normalizeFloatValue(p_value, p_inMinValue, p_inMaxValue, p_outMinValue, p_outMaxValue, p_isInversionNeeded);
+	}
+
+	return 0;
+}
+
+
 static void UTI_resetRtcTime(RTC_TimeTypeDef *p_time)
 {
   p_time->Hours   = 0;

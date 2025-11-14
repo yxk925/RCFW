@@ -21,4 +21,7 @@ float    UTI_clampFloatValue    (float   p_value, float   p_minValue  , float   
 int32_t  UTI_normalizeIntValue  (int32_t p_value, int32_t p_inMinValue, int32_t p_inMaxValue, int32_t p_outMinValue, int32_t    p_outMaxValue, bool p_isInversionNeeded);
 float    UTI_normalizeFloatValue(float   p_value, float   p_inMinValue, float   p_inMaxValue, float   p_outMinValue, float      p_outMaxValue, bool p_isInversionNeeded);
 
+int32_t  UTI_normalizeIntValueExclude0  (int32_t p_value, int32_t p_inMinValue, int32_t p_inMaxValue, int32_t p_outMinValue, int32_t    p_outMaxValue, bool p_isInversionNeeded);
+float    UTI_normalizeFloatValueExclude0(float   p_value, float   p_inMinValue, float   p_inMaxValue, float   p_outMinValue, float      p_outMaxValue, bool p_isInversionNeeded);
+
 #endif /* __UTILS_H */
